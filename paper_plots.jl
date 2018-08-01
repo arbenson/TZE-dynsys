@@ -55,18 +55,15 @@ function plots_36(eigenvalue::Float64)
     xlabel("Iteration", fontsize=fsz)
     ylabel("Rayleigh quotient", fontsize=fsz)
     if eigenvalue == 0.0018
-        quotients = all_quotients[1]
-        plot(1:(length(quotients)-1), quotients[2:end])
+        plot(all_quotients[1][2:end])
         ylim(0, 0.002)
         title("V5 (λ = 0.0018)", fontsize=fsz)
     elseif eigenvalue == 0.0033
-        quotients = all_quotients[4]
-        plot(1:(length(quotients)-1), quotients[2:end])
+        plot(all_quotients[4][2:end])
         ylim(-0.01, 0.004)
         title("V5 (λ = 0.0033)", fontsize=fsz)
     elseif eigenvalue == 0.2294
-        quotients = all_quotients[5]
-        plot(1:(length(quotients)-1), quotients[2:end])
+        plot(all_quotients[5][2:end])
         ylim(0, 0.25)
         title("V5 (λ = 0.2294)", fontsize=fsz)
     else
@@ -90,50 +87,39 @@ end
 
 function plots_411(eigenvalue::Float64)
     srand(1)
-    n = 5
-    T = T_411(n)
+    T = T_411(5)
+    maxiter = 30
+    FE = forward_euler(0.5)    
 
-    niter = 30
-    h = 0.5
-
-    #=
-    Map(M) = Mx(M, x -> sortperm(abs.(x), rev=true), 1)
+    figure()
+    fsz = 16
+    xlabel("Iteration", fontsize=fsz)
+    ylabel("Rayleigh quotient", fontsize=fsz)
     x0=rand(Float64,n)
-    quotients, xhist = Z_evec_dynsys_forward_euler(T,h,niter,Map,normalize(x0))
-    pyplot(size=(125,125))
-    plot(0:(length(quotients)-1), -quotients, legend=false)
-    xlabel!("Iteration")
-    ylabel!("Rayleigh quotient")
-    title!("V1 (λ = 9.9779)")
-    ylims!(4,10.5)
-    gui()
-    savefig("V1-411.pdf")
-    =#
-
-    Map(M) = Mx(M, x -> sortperm(abs.(x)), 1)
-    x0 = rand(Float64, n)    
-    quotients, xhist = Z_evec_dynsys_forward_euler(T,h,niter,Map,normalize(x0))
-    pyplot(size=(125,125))
-    plot(0:(length(quotients)-1), -quotients, legend=false)
-    xlabel!("Iteration")
-    ylabel!("Rayleigh quotient")
-    title!("V2 (λ = 0.0000)")
-    ylims!(-0.5,4)
-    gui()
-    savefig("V2-411.pdf")
-
-    #=
-    Map(M) = Mx(M, x -> sortperm(real.(x), rev=true), 1)
-    x0 = rand(Float64, n)   
-    quotients, xhist = Z_evec_dynsys_forward_euler(T,h,niter,Map,normalize(x0))
-    pyplot(size=(125,125))
-    plot(0:(length(quotients)-1), quotients, legend=false)
-    xlabel!("Iteration")
-    ylabel!("Rayleigh quotient")
-    title!("V3 (λ = 4.2876)")
-    ylims!(-5, 5)
-    gui()
-    savefig("V3-411.pdf")
-    =#
+    figname = ""
+    if eigenvalue == 9.9779
+        quotients, xhist = TZE_dynsys(T, largest_magnitude(), FE, x0=x0, tol=1e-16, maxiter=maxiter)
+        plot(-quotients[2:end])
+        title("V1 (λ = 9.9779)")
+        ylim(4,10.5)
+        figname = "ex411-V1.eps"
+    elseif eigenvalue == 0.0000
+        Map(M) = Mx(M, x -> sortperm(abs.(x)), 1)
+        quotients, xhist = TZE_dynsys(T, smallest_magnitude(), FE, x0=x0, tol=1e-16, maxiter=maxiter)
+        plot(-quotients[2:end])
+        title("V2 (λ = 0.0000)")
+        ylims(-0.5,4)
+        figname = "ex411-V2.eps"
+    elseif eigenvalue == 4.2876
+        quotients, xhist = TZE_dynsys(T, largest_algebraic(), FE, x0=x0, tol=1e-16, maxiter=maxiter)        
+        plot(quotients[2:end])
+        title("V3 (λ = 4.2876)")
+        ylim(-5, 5)
+        figname = "ex411-V3.eps"
+    end
+    ax = gca()
+    ax[:tick_params]("both", labelsize=fsz, length=5, width=1.5)
+    tight_layout()
+    savefig(figname)
 end
 ;
