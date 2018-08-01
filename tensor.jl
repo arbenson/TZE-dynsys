@@ -107,3 +107,4 @@ function collapse(T::SparseTensor5, x::Vector{Float64})
     n = T.dimension
     return convert(SpFltMat, sparse(T.I1, T.I2, V, n, n))
 end
+;
