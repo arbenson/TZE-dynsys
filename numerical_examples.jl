@@ -1,48 +1,10 @@
+include("dynsys.jl")
+
 using Combinatorics
-using Plots
+using PyPlot
 
-function tensor_apply(T::Array{Float64,3}, x::Vector{Float64})
-    n = length(x)
-    y = zeros(Float64,n)
-    for k in 1:n; y += T[:,:,k] * x * x[k]; end
-    return y
-end
-
-function tensor_collapse(T::Array{Float64,3}, x::Vector{Float64})
-    n = length(x)
-    Y = zeros(Float64,n,n)
-    for k in 1:n; Y += T[:,:,k] * x[k]; end
-    return Y
-end
-
-function Z_evec_dynsys_forward_euler(
-        T::Array{Float64,3}, h::Float64, niter::Int64=30,
-        L=(M -> ((d,V) = eig(M); j = sortperm(real(d))[1];
-                 V[:,j]*sign(V[1,j]))),
-        x0::Vector{Float64}=normalize(ones(Float64,size(T,1))))
-    function deriv(u::Vector{Float64})
-        return L(tensor_collapse(T, u)) - u
-    end
-    evec_hist = zeros(length(x0), niter + 1)
-    evec_hist[:, 1] = x0
-    eval_hist = [x0' * tensor_apply(T, x0)]
-    for i = 1:niter
-        x_prev = evec_hist[:, i]
-        x_next = x_prev + h * deriv(x_prev)
-        evec_hist[:, i + 1] = x_next
-        push!(eval_hist, real(x_next' * tensor_apply(T, x_next)))
-    end
-    return (evec_hist, eval_hist)
-end
-
-function Mx(M::Array{Float64, 2}, f, k)
-    (d,V) = eig(M)
-    V = real(V)
-    j = f(d)[k]
-    v = V[:, j]
-    return v * sign(v[2])
-end
-
+# Tensor in Example 3.6 from Kolda and Mayo. "Shifted power method for computing
+# tensor eigenpairs." SIMAX, 2011.
 function T_36()
     function symtensor(T::Array{Float64})
         S = zeros(T)
@@ -50,7 +12,7 @@ function T_36()
         for p in permutations(1:d)
             S += permutedims(T,p)
         end
-        S
+    return S
     end
     
     T = zeros(Float64, 3,3,3)
@@ -77,62 +39,51 @@ end
 function plots_36(eigenvalue::Float64)
     srand(1)
     T = T_36()
-    n = 3
-    niter = 30
-    h = 0.5
+    maxiter = 30
 
-    Map(M) = Mx(M, x -> sortperm(real.(x)), 2)
     all_quotients = []
+    Λ = kth_smallest_algebraic(2)
+    FE = forward_euler(0.5)
     for i in 1:100
-        x0=randn(Float64,n)
-        xhist, quotients = Z_evec_dynsys_forward_euler(T,h,niter,Map,normalize(x0))
+        x0=randn(Float64, size(T)[1])
+        quotients, xhist = TZE_dynsys(T, Λ, FE, x0=x0, tol=1e-16, maxiter=maxiter)
         push!(all_quotients, quotients)
     end
-    for (i, qs) in enumerate(all_quotients)
-        qend = qs[end]
-        println("$i $qend")
-    end
 
+    figure()
+    fsz = 16
+    xlabel("Iteration", fontsize=fsz)
+    ylabel("Rayleigh quotient", fontsize=fsz)
     if eigenvalue == 0.0018
-        pyplot(size=(175,175))
-        xlabel!("Iteration")
-        ylabel!("Rayleigh quotient")
         quotients = all_quotients[1]
-        plot(0:(length(quotients)-1), quotients, legend=false)
-        title!("V5 (λ = 0.0018)")
-        ylims!(0, 0.002)
-        gui()
-        savefig("V5a-36.pdf")
-    end
-    if eigenvalue == 0.0033
+        plot(1:(length(quotients)-1), quotients[2:end])
+        ylim(0, 0.002)
+        title("V5 (λ = 0.0018)", fontsize=fsz)
+    elseif eigenvalue == 0.0033
         quotients = all_quotients[4]
-        plot(0:(length(quotients)-1), quotients, legend=false)
-        title!("V5 (λ = 0.0033)")
-        ylims!(0, 0.004)
-        gui()
-        savefig("V5b-36.pdf")
-    end
-    if eigenvalue == 0.2294
+        plot(1:(length(quotients)-1), quotients[2:end])
+        ylim(-0.01, 0.004)
+        title("V5 (λ = 0.0033)", fontsize=fsz)
+    elseif eigenvalue == 0.2294
         quotients = all_quotients[5]
-        pyplot(size=(150,150))
-        plot(0:(length(quotients)-1), quotients, legend=false)
-        xlabel!("Iteration")
-        ylabel!("Rayleigh quotient")
-        title!("V5 (λ = 0.2294)")
-        ylims!(0, 0.25)
-        gui()
-        savefig("V5c-36.pdf")
+        plot(1:(length(quotients)-1), quotients[2:end])
+        ylim(0, 0.25)
+        title("V5 (λ = 0.2294)", fontsize=fsz)
+    else
+        error("Unkown eigenvalue")
     end
+    ax = gca()
+    ax[:tick_params]("both", labelsize=fsz, length=5, width=1.5)
+    tight_layout()
+    savefig(string("ex36-V5-", "$(eigenvalue)"[3:end], ".eps"))
 end
 
+# Tensor in Example 4.11 from Cui, Dai, and Nie. "All real eigenvalues of
+# symmetric tensors.", SIMAX, 2014.
 function T_411(n::Int64)
     A = zeros(Float64, n, n, n)
-    for i = 1:n
-        for j = 1:n
-            for k = 1:n
-                A[i, j, k] = (-1)^i / i + (-1)^j / j + (-1)^k / k
-            end
-        end
+    for i in 1:n, j in 1:n, k in 1:n
+        A[i, j, k] = (-1)^i / i + (-1)^j / j + (-1)^k / k
     end
     return A
 end
@@ -148,7 +99,7 @@ function plots_411(eigenvalue::Float64)
     #=
     Map(M) = Mx(M, x -> sortperm(abs.(x), rev=true), 1)
     x0=rand(Float64,n)
-    xhist, quotients = Z_evec_dynsys_forward_euler(T,h,niter,Map,normalize(x0))
+    quotients, xhist = Z_evec_dynsys_forward_euler(T,h,niter,Map,normalize(x0))
     pyplot(size=(125,125))
     plot(0:(length(quotients)-1), -quotients, legend=false)
     xlabel!("Iteration")
@@ -161,7 +112,7 @@ function plots_411(eigenvalue::Float64)
 
     Map(M) = Mx(M, x -> sortperm(abs.(x)), 1)
     x0 = rand(Float64, n)    
-    xhist, quotients = Z_evec_dynsys_forward_euler(T,h,niter,Map,normalize(x0))
+    quotients, xhist = Z_evec_dynsys_forward_euler(T,h,niter,Map,normalize(x0))
     pyplot(size=(125,125))
     plot(0:(length(quotients)-1), -quotients, legend=false)
     xlabel!("Iteration")
@@ -174,7 +125,7 @@ function plots_411(eigenvalue::Float64)
     #=
     Map(M) = Mx(M, x -> sortperm(real.(x), rev=true), 1)
     x0 = rand(Float64, n)   
-    xhist, quotients = Z_evec_dynsys_forward_euler(T,h,niter,Map,normalize(x0))
+    quotients, xhist = Z_evec_dynsys_forward_euler(T,h,niter,Map,normalize(x0))
     pyplot(size=(125,125))
     plot(0:(length(quotients)-1), quotients, legend=false)
     xlabel!("Iteration")

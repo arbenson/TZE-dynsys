@@ -1,34 +1,57 @@
-function kth_largest_algebraic(M::Array{Float64,2}, k::Int64)
+function _kth_largest_algebraic(M::Array{Float64,2}, k::Int64)
     (d, V) = eig(M)
     j = sortperm(real.(d), rev=true)[k]
-    return V[:, k] * sign(V[1, k])
+    return V[:, k] * sign(V[2, k])
 end
-largest_algebraic(M::Array{Float64,2}) =
-    kth_largest_algebraic(M::Array{Float64,2}, 1)
+function kth_largest_algebraic(k::Int64)
+    ret(M::Array{Float64,2}) = _kth_largest_algebraic(M, k)
+    return ret
+end
+function largest_algebraic()
+    ret(M::Array{Float64,2}) = _kth_largest_algebraic(M, 1)
+    return ret
+end
 
-function kth_largest_magnitude(M::Array{Float64,2}, k::Int64)
+function _kth_largest_magnitude(M::Array{Float64,2}, k::Int64)
     M = collapse(T, x)
-    (d,V) = eig(M)
+    (d, V) = eig(M)
     j = sortperm(abs.(d), rev=true)[k]
-    return V[:, k] * sign(V[1, k])
+    return V[:, k] * sign(V[2, k])
 end
-largest_magnitude(M::Array{Float64,2}) =
-    kth_largest_algebraic(M::Array{Float64,2}, 1)
+function kth_largest_magnitude(k::Int64)
+    ret(M::Array{Float64,2}) = _kth_largest_magnitude(M, k)
+    return ret
+end
+function largest_magnitude()
+    ret(M::Array{Float64,2}) = _kth_largest_magnitude(M, 1)
+    return ret
+end
 
-function kth_smallest_algebraic(M::Array{Float64,2}, k::Int64)
-    M = collapse(T, x)
-    (d,V) = eig(M)
+function _kth_smallest_algebraic(M::Array{Float64,2}, k::Int64)
+    (d, V) = eig(M)
     j = sortperm(real.(d))[k]
-    return V[:, k] * sign(V[1, k])
+    return V[:, k] * sign(V[2, k])
 end
-smallest_algebraic(M::Array{Float64,2}) =
-    kth_smallest_algebraic(M::Array{Float64,2}, 1)
+function kth_smallest_algebraic(k::Int64)
+    ret(M::Array{Float64,2}) = _kth_smallest_algebraic(M, k)
+    return ret
+end
+function smallest_algebraic()
+    ret(M::Array{Float64,2}) = _kth_smallest_algebraic(M, 1)
+    return ret
+end
 
-function kth_smallest_magnitude(M::Array{Float64,2}, k::Int64)
-    M = collapse(T, x)
-    (d,V) = eig(M)
+function _kth_smallest_magnitude(M::Array{Float64,2}, k::Int64)
+    (d, V) = eig(M)
     j = sortperm(abs.(d), rev=true)[k]
-    return V[:, k] * sign(V[1, k])
+    return V[:, k] * sign(V[2, k])
 end
-smallest_magnitude(M::Array{Float64,2}) =
-    kth_smallest_magnitude(M::Array{Float64,2}, 1)
+function kth_smallest_magnitude(k::Int64)
+    ret(M::Array{Float64,2}) = _kth_smallest_magnitude(M, k)
+    return ret
+end
+function smallest_magnitude()
+    ret(M::Array{Float64,2}) = _kth_smallest_magnitude(M, 1)
+    return ret
+end
+;

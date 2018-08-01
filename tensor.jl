@@ -1,5 +1,5 @@
 function check_dimensions(T::Array{Float64}, x::Vector{Float64})
-    if !all(size(T) == length(x))
+    if !all(size(T) .== length(x))
         error("Vector and tensor dimensions do not match")
     end
 end

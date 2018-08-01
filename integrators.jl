@@ -1,5 +1,5 @@
 function _forward_euler(f, x_curr::Vector{Float64}, h::Float64)
-    return x_curr + h * f (x_curr)
+    return x_curr + h * f(x_curr)
 end
 
 function _RK4(f, x_curr::Vector{Float64}, h::Float64)
@@ -22,8 +22,8 @@ Returns:
 A function that takes as input a derivative function and a vector and returns
 the next iterate.  
 """
-function forward_euler(h::Foat64)
-    ret(f, x_curr::Float64) = _forward_euler(f, x, h)
+function forward_euler(h::Float64)
+    ret(f, x_curr::Vector{Float64}) = _forward_euler(f, x_curr, h)
     return ret
 end
 
@@ -40,7 +40,8 @@ Returns:
 A function that takes as input a derivative function and a vector and returns
 the next iterate.  
 """
-function RK4(h::Foat64)
-    ret(f, x_curr::Float64) = _RK4(f, x, h)
+function RK4(h::Float64)
+    ret(f, x_curr::Vector{Float64}) = _RK4(f, x_curr, h)
     return ret
 end
+;
