@@ -28,8 +28,8 @@ eval_hist is the history of eigenvalue estimates, and each column of evec_hist
 are the corresponding eigenvector estimate.
 """
 function TZE_dynsys(T::Array{Float64}, Λ, Integrator;
-                    x0::Vector{Float64}=normalize(ones(Float64,T.dimension)),
-                    tol::Float64=1e-6,
+                    x0::Vector{Float64}=normalize(ones(Float64, size(T)[1])),
+                    tol::Float64=1e-10,
                     maxiter::Int64=100)
     # Data recording
     evec_hist = zeros(Float64, length(x0), maxiter + 1)
@@ -46,14 +46,14 @@ function TZE_dynsys(T::Array{Float64}, Λ, Integrator;
         x_next = real.(Integrator(derivative, x_curr))
         evec_hist[:, iter + 1] = x_next
         y = apply(T, x_next)
-        eval_hist[iter + 1] = x_next' * y
+        rq = x_next' * y
+        eval_hist[iter + 1] = rq
         # Break if we are close enough to an eigenvalue
-        rats = abs.(y ./ x_next)
         iter += 1
-        if maximum(rats) - minimum(rats) < tol
+        if norm(y - rq * x_next, 2) / norm(y, 2) <= tol
             break
         end
     end
-    return (eval_hist[1:iter], evec_hist[1:iter])
+    return (eval_hist[1:iter], evec_hist[:,1:iter])
 end
 ;
