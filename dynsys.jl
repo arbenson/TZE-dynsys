@@ -1,42 +1,10 @@
-function kth_largest_algebraic(M::Array{Float64,2} k::Int64)
-    (d, V) = eig(M)
-    j = sortperm(real.(d), rev=true)[k]
-    return V[:, k] * sign(V[1, k])
-end
-largest_algebraic(M::Array{Float64,2}) =
-    kth_largest_algebraic(M::Array{Float64,2}, 1)
-
-function kth_largest_magnitude(M::Array{Float64,2}, k::Int64)
-    M = collapse(T, x)
-    (d,V) = eig(M)
-    j = sortperm(abs.(d), rev=true)[k]
-    return V[:, k] * sign(V[1, k])
-end
-largest_magnitude(M::Array{Float64,2}) =
-    kth_largest_algebraic(M::Array{Float64,2}, 1)
-
-function kth_smallest_algebraic(M::Array{Float64,2}, k::Int64)
-    M = collapse(T, x)
-    (d,V) = eig(M)
-    j = sortperm(real.(d))[k]
-    return V[:, k] * sign(V[1, k])
-end
-smallest_algebraic(M::Array{Float64,2}) =
-    kth_smallest_algebraic(M::Array{Float64,2}, 1)
-
-function kth_smallest_magnitude(M::Array{Float64,2}, k::Int64)
-    M = collapse(T, x)
-    (d,V) = eig(M)
-    j = sortperm(abs.(d), rev=true)[k]
-    return V[:, k] * sign(V[1, k])
-end
-smallest_magnitude(M::Array{Float64,2}) =
-    kth_smallest_magnitude(M::Array{Float64,2}, 1)
-
-forward_euler(f::Vector{Float64}, x_curr::Vector{Float64}, h::Float64) = x_curr + h * f 
+include("tensor.jl")
+include("integrators.jl")
+include("eval_maps.jl")
 
 # Integrator returns new iterate
-function TZEDS(T::Tensor, Λ, Integrator;
+
+function TZEDS(T::Array{Float64}, Λ, Integrator;
                x0::Vector{Float64}=normalize(ones(Float64,T.dimension)),
                tol::Float64=1e-6,
                maxiter::Int64=100)
@@ -64,3 +32,4 @@ function TZEDS(T::Tensor, Λ, Integrator;
     end
     return (eval_hist[1:(iter + 1)], evec_hist[1:(iter + 1)])
 end
+;
