@@ -39,32 +39,34 @@ end
 function plots_36(eigenvalue::Float64)
     srand(1)
     T = T_36()
-    maxiter = 30
+    maxiter = 20
 
     all_quotients = []
     Λ = kth_smallest_algebraic(2)
     FE = forward_euler(0.5)
     for i in 1:100
         x0=randn(Float64, size(T)[1])
-        quotients, xhist = TZE_dynsys(T, Λ, FE, x0=x0, tol=1e-16, maxiter=maxiter)
+        tol = -1.0  # negative to do maximum number of iterations
+        quotients, xhist = TZE_dynsys(T, Λ, FE, x0=x0, tol=tol, maxiter=maxiter)
         push!(all_quotients, quotients)
     end
 
+    close()
     figure()
     fsz = 16
     xlabel("Iteration", fontsize=fsz)
     ylabel("Rayleigh quotient", fontsize=fsz)
     if eigenvalue == 0.0018
-        plot(all_quotients[1][2:end])
-        ylim(0, 0.002)
+        plot(all_quotients[1], marker="o")
+        ylim(-0.004, 0.002)
         title("V5 (λ = 0.0018)", fontsize=fsz)
     elseif eigenvalue == 0.0033
-        plot(all_quotients[4][2:end])
-        ylim(-0.01, 0.004)
+        plot(all_quotients[4], marker="o")
+        ylim(-0.09, 0.01)
         title("V5 (λ = 0.0033)", fontsize=fsz)
     elseif eigenvalue == 0.2294
-        plot(all_quotients[5][2:end])
-        ylim(0, 0.25)
+        plot(all_quotients[5], marker="o")
+        ylim(-0.1, 0.25)
         title("V5 (λ = 0.2294)", fontsize=fsz)
     else
         error("Unkown eigenvalue")
@@ -88,33 +90,35 @@ end
 function plots_411(eigenvalue::Float64)
     srand(1)
     T = T_411(5)
-    maxiter = 30
-    FE = forward_euler(0.5)    
+    maxiter = 20
+    tol = -1.0  # negative to run all of the iterations
+    FE = forward_euler(0.5) 
 
+    close()
     figure()
     fsz = 16
     xlabel("Iteration", fontsize=fsz)
     ylabel("Rayleigh quotient", fontsize=fsz)
-    x0=rand(Float64,n)
+    x0=rand(Float64, size(T)[1])
     figname = ""
+
     if eigenvalue == 9.9779
-        quotients, xhist = TZE_dynsys(T, largest_magnitude(), FE, x0=x0, tol=1e-16, maxiter=maxiter)
-        plot(-quotients[2:end])
+        quotients, xhist = TZE_dynsys(T, largest_magnitude(), FE, x0=x0, tol=tol, maxiter=maxiter)
+        plot(-quotients, marker="o")
         title("V1 (λ = 9.9779)")
-        ylim(4,10.5)
+        ylim(1, 10.5)
         figname = "ex411-V1.eps"
     elseif eigenvalue == 0.0000
-        Map(M) = Mx(M, x -> sortperm(abs.(x)), 1)
-        quotients, xhist = TZE_dynsys(T, smallest_magnitude(), FE, x0=x0, tol=1e-16, maxiter=maxiter)
-        plot(-quotients[2:end])
+        quotients, xhist = TZE_dynsys(T, smallest_magnitude(), FE, x0=x0, tol=tol, maxiter=maxiter)
+        plot(quotients, marker="o")
         title("V2 (λ = 0.0000)")
-        ylims(-0.5,4)
+        ylim(-0.5, 4)
         figname = "ex411-V2.eps"
     elseif eigenvalue == 4.2876
-        quotients, xhist = TZE_dynsys(T, largest_algebraic(), FE, x0=x0, tol=1e-16, maxiter=maxiter)        
-        plot(quotients[2:end])
+        quotients, xhist = TZE_dynsys(T, largest_algebraic(), FE, x0=x0, tol=tol, maxiter=maxiter)        
+        plot(-quotients, marker="o")
         title("V3 (λ = 4.2876)")
-        ylim(-5, 5)
+        ylim(4, 5)
         figname = "ex411-V3.eps"
     end
     ax = gca()

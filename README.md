@@ -12,5 +12,12 @@ For questions, please email Austin at arb@cs.cornell.edu.
 
 ```julia
 include("paper_plots.jl")
+
+plots_36(0.0018)
+plots_36(0.0033)
+plots_36(0.2294)
+
+plots_411(9.9779)
+
 ```
 

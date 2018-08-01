@@ -13,7 +13,6 @@ function largest_algebraic()
 end
 
 function _kth_largest_magnitude(M::Array{Float64,2}, k::Int64)
-    M = collapse(T, x)
     (d, V) = eig(M)
     j = sortperm(abs.(d), rev=true)[k]
     return V[:, k] * sign(V[2, k])
