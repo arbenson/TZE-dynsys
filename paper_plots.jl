@@ -53,19 +53,19 @@ function plots_36(eigenvalue::Float64)
 
     close()
     figure()
-    fsz = 16
+    fsz = 24
     xlabel("Iteration", fontsize=fsz)
     ylabel("Rayleigh quotient", fontsize=fsz)
     if eigenvalue == 0.0018
-        plot(all_quotients[1], marker="o")
+        plot(all_quotients[1], marker="o", lw=2)
         ylim(-0.004, 0.0025)
         title("V5 (λ = 0.0018)", fontsize=fsz)
     elseif eigenvalue == 0.0033
-        plot(all_quotients[4], marker="o")
+        plot(all_quotients[4], marker="o", lw=2)
         ylim(-0.09, 0.01)
         title("V5 (λ = 0.0033)", fontsize=fsz)
     elseif eigenvalue == 0.2294
-        plot(all_quotients[5], marker="o")
+        plot(all_quotients[5], marker="o", lw=2)
         ylim(-0.1, 0.25)
         title("V5 (λ = 0.2294)", fontsize=fsz)
     else
@@ -95,7 +95,7 @@ function plots_411(eigenvalue::Float64)
 
     close()
     figure()
-    fsz = 16
+    fsz = 24
     xlabel("Iteration", fontsize=fsz)
     ylabel("Rayleigh quotient", fontsize=fsz)
     x0 = normalize(ones(Float64, size(T)[1]))
@@ -103,21 +103,20 @@ function plots_411(eigenvalue::Float64)
 
     if eigenvalue == 9.9779
         quotients, xhist = TZE_dynsys(T, largest_magnitude(), FE, x0=x0, tol=tol, maxiter=maxiter)
-        plot(-quotients, marker="o")
-        title("V1 (λ = 9.9779)")
+        plot(-quotients, marker="o", lw=2)
+        title("V1 (λ = 9.9779)", fontsize=fsz)
         ylim(5, 10.5)
         figname = "ex411-V1.eps"
     elseif eigenvalue == 0.0000
         quotients, xhist = TZE_dynsys(T, smallest_magnitude(), FE, x0=x0, tol=tol, maxiter=maxiter)
-        plot(quotients, marker="o")
-        title("V2 (λ = 0.0000)")
+        plot(quotients, marker="o", lw=2)
+        title("V2 (λ = 0.0000)", fontsize=fsz)
         ylim(-5.5, 0.5)
         figname = "ex411-V2.eps"
     elseif eigenvalue == 4.2876
         quotients, xhist = TZE_dynsys(T, largest_algebraic(), FE, x0=x0, tol=tol, maxiter=maxiter)
-        @show quotients
-        plot(quotients, marker="o")
-        title("V3 (λ = 4.2876)")
+        plot(quotients, marker="o", lw=2)
+        title("V3 (λ = 4.2876)", fontsize=fsz)
         ylim(-6, 5)
         figname = "ex411-V3.eps"
     else
