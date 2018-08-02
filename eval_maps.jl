@@ -1,5 +1,7 @@
 function safer_sign(v::Vector{Float64})
-    sgn = sign(v[2])
+    ind = findfirst(abs.(v) .> length(v) * 1e-16)
+    if ind == 0; ind = 1; end
+    sgn = sign(v[ind])
     if sgn == 0.0; return 1.0; end
     return sgn
 end
@@ -8,7 +10,6 @@ function _kth_largest_algebraic(M::Array{Float64,2}, k::Int64)
     (d, V) = eig(M)
     j = sortperm(real.(d), rev=true)[k]
     v = real.(V[:, j])
-    @show v
     return v * safer_sign(v)
 end
 function kth_largest_algebraic(k::Int64)
