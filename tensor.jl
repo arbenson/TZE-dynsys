@@ -34,6 +34,16 @@ function apply(T::Array{Float64,5}, x::Vector{Float64})
     return y
 end
 
+function apply(T::Array{Float64,6}, x::Vector{Float64})
+    check_dimensions(T, x)
+    n = length(x)
+    y = zeros(Float64,n)
+    for s in 1:n, r in 1:n, l in 1:n, k in 1:n
+        y += T[:,:,k,l,r,s] * x * x[k] * x[l] * x[r] * x[s]
+    end
+    return y
+end
+
 function collapse(T::Array{Float64,3}, x::Vector{Float64})
     check_dimensions(T, x)    
     n = length(x)
@@ -60,6 +70,16 @@ function collapse(T::Array{Float64,5}, x::Vector{Float64})
     Y = zeros(Float64,n, n)
     for r in 1:n, l in 1:n, k in 1:n
         Y += T[:,:,k,l,r] * x[k] * x[l] * x[r]
+    end
+    return Y
+end
+
+function collapse(T::Array{Float64,6}, x::Vector{Float64})
+    check_dimensions(T, x)
+    n = length(x)
+    Y = zeros(Float64,n, n)
+    for s in 1:n, r in 1:n, l in 1:n, k in 1:n
+        Y += T[:,:,k,l,r,s] * x[k] * x[l] * x[r] * x[s]
     end
     return Y
 end
