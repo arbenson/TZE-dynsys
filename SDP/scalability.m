@@ -5,7 +5,7 @@ addpath('/Users/arb/codes/TZE-dynsys/SDP/gloptipoly3');
 order = 3;  % order of tensor
 p = 2;      % z-eigenvector
 
-for dim = 12:15
+for dim = 13:15
     mpol('x', dim);
     f_A = x(1)^0 - 1;  % start with 0 polynomial
     for i = 1:dim
@@ -18,9 +18,8 @@ for dim = 12:15
     end
 
     begintime = tic;
-    f_c = [];
     profile on
-    [evals, eigvec, info] = AReigSTensors(f_A, f_c, mpol(x), order, p, []);
+    [evals, eigvec, info] = AReigSTensors(f_A, [], mpol(x), order, p, []);
     time = toc(begintime);
     save(sprintf('results/SDP-evals-%d-%d.mat', order, dim), ...
          'evals', 'time', 'dim', 'order');
@@ -46,9 +45,8 @@ for dim = 5:15
     end
 
     begintime = tic;
-    f_c = [];
     profile on
-    [evals, eigvec, info] = AReigSTensors(f_A, f_c, mpol(x), order, p, []);
+    [evals, eigvec, info] = AReigSTensors(f_A, [], mpol(x), order, p, []);
     time = toc(begintime);
     save(sprintf('results/SDP-evals-%d-%d.mat', order, dim), ...
          'evals', 'time', 'dim', 'order');
@@ -76,9 +74,8 @@ for dim = 5:15
     end
 
     begintime = tic;
-    f_c = [];
     profile on
-    [evals, eigvec, info] = AReigSTensors(f_A, f_c, mpol(x), order, p, []);
+    [evals, eigvec, info] = AReigSTensors(f_A, [], mpol(x), order, p, []);
     time = toc(begintime);
     save(sprintf('results/SDP-evals-%d-%d.mat', order, dim), ...
          'evals', 'time', 'dim', 'order');

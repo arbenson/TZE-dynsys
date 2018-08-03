@@ -1,6 +1,7 @@
 include("dynsys.jl")
 
 using Combinatorics
+using MAT
 using PyPlot
 
 # Tensor in Example 3.6 from Kolda and Mayo. "Shifted power method for computing
@@ -126,5 +127,65 @@ function plots_411(eigenvalue::Float64)
     ax[:tick_params]("both", labelsize=fsz, length=5, width=1.5)
     tight_layout()
     savefig(figname)
+end
+
+function scalability(order::Int64)
+    function get_time(method::String, dim::Int64)
+        endstr = "evals-$order-$dim.mat"
+        if method == "DS";     return matread("results/TZE-$(endstr)")["time"];           end
+        if method == "SDP";    return matread("SDP/results/SDP-$(endstr)")["time"];       end
+        if method == "SSHOPM"; return matread("SSHOPM/results/SSHOPM-$(endstr)")["time"]; end
+        error("Unknown method $method")
+    end
+
+    close()
+    fsz=20
+    dims = 5:12
+    ds_times     = [get_time("DS",     dim) for dim in dims]
+    sdp_times    = [get_time("SDP",    dim) for dim in dims]
+    sshopm_times = [get_time("SSHOPM", dim) for dim in dims]    
+
+    semilogy(collect(dims), ds_times,     lw=1.5, marker="s", label="DS")
+    semilogy(collect(dims), sdp_times,    lw=1.5, marker="o", label="SDP")
+    semilogy(collect(dims), sshopm_times, lw=1.5, marker="x", label="SSHOPM")
+    xlabel("Dimension", fontsize=fsz)
+    ylabel("Running time (seconds)", fontsize=fsz)
+    legend(fontsize=fsz-4, loc="upper left", frameon=false)
+    title("Order-$(order) tensors", fontsize=fsz)
+    ax = gca()
+    ax[:tick_params]("both", labelsize=fsz-4, length=6, width=1.5)
+    ax[:tick_params]("both", which="minor", length=2, width=1)
+    tight_layout()
+    savefig("scalability-$(order).eps")
+end
+
+function unique_evals(order::Int64)
+    function get_evals(method::String, dim::Int64)
+        endstr = "evals-$order-$dim.mat"
+        evals = Float64[]
+        if     method == "DS";     evals = matread("results/TZE-$(endstr)")["evals"]
+        elseif method == "SDP";    evals = matread("SDP/results/SDP-$(endstr)")["evals"]
+        elseif method == "SSHOPM"; evals = matread("SSHOPM/results/SSHOPM-$(endstr)")["evals"]
+        else   error("Unknown method $method");
+        end
+        evals = vec(evals)
+        if length(evals) == 0; return evals; end
+        # With odd-order tensors, we have sign ambiguity
+        if order % 2 == 1; evals = abs.(evals); end
+        sort!(evals)
+        # Get everything within tolerance 1e-4 (tolerance used by all methods)
+        tol = 1e-4
+        unique_evals = [evals[1]]
+        for eval in evals
+            if eval > unique_evals[end] + 1e-4
+                push!(unique_evals, eval)
+            end
+        end
+        return unique_evals
+    end
+
+    @show get_evals("SDP", 7)
+    @show get_evals("DS", 7)
+    @show get_evals("SSHOPM", 7)
 end
 ;

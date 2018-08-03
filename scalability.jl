@@ -35,7 +35,7 @@ function run_test(dim::Int64, order::Int64)
     srand(1234)
     T = test_tensor(dim, order)
     num_trials = 50
-    tol = 1e-6
+    tol = 1e-4
     maxiter = 50
 
     FE = forward_euler(0.5)
@@ -69,7 +69,7 @@ function main()
             time = toq();
             
             # Record data
-            matwrite("results/TZE-evals-$order-$(dimension).mat",
+            matwrite("results/DS-evals-$order-$(dimension).mat",
                      Dict("order"     => order,
                           "dimension" => dimension,
                           "time"      => time,

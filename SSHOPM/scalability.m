@@ -1,6 +1,6 @@
 addpath('/Users/arb/codes/TZE-dynsys/SSHOPM/tensor_toolbox-master');
-numtrials = 50;
-tol = 1e-6;
+basertrials = 50;
+tol = 1e-4;
 shift = 1;
 
 %%
@@ -16,6 +16,7 @@ for dim = 5:15
         end
     end
 
+    numtrials = basetrials * 2 * dim;  % to match with dynamical systems
     evals = zeros(numtrials,1);
     successes = zeros(numtrials,1);
     begintime = tic;
@@ -46,6 +47,7 @@ for dim = 5:15
         end
     end
 
+    numtrials = basetrials * 2 * dim;  % to match with dynamical systems		
     evals = zeros(numtrials,1);
     successes = zeros(numtrials,1);
     begintime = tic;
@@ -78,6 +80,7 @@ for dim = 5:15
         end
     end
 
+    numtrials = basetrials * 2 * dim;  % to match with dynamical systems		    
     evals = zeros(numtrials,1);
     successes = zeros(numtrials,1);
     begintime = tic;
@@ -92,4 +95,3 @@ for dim = 5:15
     save(sprintf('results/SSHOPM-evals-%d-%d.mat', order, dim), ...
          'evals', 'time', 'dim', 'order');
 end
-
