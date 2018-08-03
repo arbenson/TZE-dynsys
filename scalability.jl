@@ -66,20 +66,14 @@ function main()
             evals = run_test(dimension, order);
             tic();
             run_test(dimension, order);
-            t = toq();
-            
-            # Make sure to capture sign
-            if order % 2 == 1; evals = abs.(evals); end
+            time = toq();
             
             # Record data
-            push!(times, t)
-            push!(all_evals, sort(evals))
-            push!(dimensions, dimension)
+            matwrite("results/TZE-evals-$order-$(dimension).mat",
+                     Dict("order"     => order,
+                          "dimension" => dimension,
+                          "time"      => time,
+                          "evals"     => evals))            
         end
-        matwrite("perf-results/performance-$order.mat",
-                 Dict("dimensions" => dimensions,
-                      "times"      => times,
-                      "evals"      => all_evals,
-                      "order"      => order))
     end
 end

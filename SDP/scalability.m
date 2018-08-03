@@ -5,7 +5,7 @@ addpath('/Users/arb/codes/TZE-dynsys/SDP/gloptipoly3');
 order = 3;  % order of tensor
 p = 2;      % z-eigenvector
 
-for dim = 5:15
+for dim = 12:15
     mpol('x', dim);
     f_A = x(1)^0 - 1;  % start with 0 polynomial
     for i = 1:dim
