@@ -40,6 +40,7 @@ function TZE_dynsys(T::Array{Float64}, Λ, Integrator;
     # Derivative of the dynamical system
     derivative(u::Vector{Float64}) = Λ(collapse(T, u)) - u
 
+    converged = false
     iter = 1
     while iter <= maxiter
         x_curr = evec_hist[:, iter]
@@ -50,10 +51,11 @@ function TZE_dynsys(T::Array{Float64}, Λ, Integrator;
         eval_hist[iter + 1] = rq
         # Break if we are close enough to an eigenvalue
         iter += 1
-        if norm(y - rq * x_next, 2) / norm(y, 2) <= tol
+        if norm(y - rq * x_next, 2) / norm(x_next, 2) <= tol
+            converged = true
             break
         end
     end
-    return (eval_hist[1:iter], evec_hist[:,1:iter])
+    return (eval_hist[1:iter], evec_hist[:,1:iter], converged)
 end
 ;

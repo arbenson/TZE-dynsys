@@ -1,7 +1,5 @@
 function safer_sign(v::Vector{Float64})
-    ind = findfirst(abs.(v) .> length(v) * 1e-16)
-    if ind == 0; ind = 1; end
-    sgn = sign(v[ind])
+    sgn = sign(v[2])
     if sgn == 0.0; return 1.0; end
     return sgn
 end
