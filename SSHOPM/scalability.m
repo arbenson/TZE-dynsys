@@ -1,5 +1,6 @@
 addpath('/Users/arb/codes/TZE-dynsys/SSHOPM/tensor_toolbox-master');
-basertrials = 50;
+basetrials = 50;
+maxiter = 100;
 tol = 1e-6;
 shift = 1;
 
@@ -22,7 +23,7 @@ for dim = 5:15
     begintime = tic;
     for iter = 1:numtrials
         [eval, x, flag, it] = ...
-            eig_sshopm(T, 'Shift', shift, 'tol', tol);
+            eig_sshopm(T, 'Shift', shift, 'tol', tol, 'MaxIts', maxiter);
         evals(iter) = eval;
         successes(iter) = (flag == 0);
     end
@@ -53,7 +54,7 @@ for dim = 5:15
     begintime = tic;
     for iter = 1:numtrials
         [eval, x, flag, it] = ...
-            eig_sshopm(T, 'Shift', shift, 'tol', tol);
+            eig_sshopm(T, 'Shift', shift, 'tol', tol, 'MaxIts', maxiter);
         evals(iter) = eval;
         successes(iter) = (flag == 0);
     end
@@ -86,7 +87,7 @@ for dim = 5:15
     begintime = tic;
     for iter = 1:numtrials
         [eval, x, flag, it] = ...
-            eig_sshopm(T, 'Shift', shift, 'tol', tol);
+            eig_sshopm(T, 'Shift', shift, 'tol', tol, 'MaxIts', maxiter);
         evals(iter) = eval;
         successes(iter) = (flag == 0);
     end
