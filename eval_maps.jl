@@ -63,4 +63,16 @@ function smallest_magnitude()
     ret(M::Array{Float64,2}) = _kth_smallest_magnitude(M, 1)
     return ret
 end
+
+function _closest_in_angle(M::Array{Float64,2}, x::Vector{Float64})
+    (d, V) = eig(M)
+    angles = abs.(vec(x' * V))
+    j = findmax(angles)[2]
+    v = real.(V[:, j])
+    return v * safer_sign(v)    
+end
+function closest_in_angle(x::Vector{Float64})
+    ret(M::Array{Float64,2}) = _closest_in_angle(M, x)
+    return ret
+end
 ;

@@ -25,8 +25,9 @@ This function needs 3 inputs:
 Here is an example of a 5-dimensional, fourth-order diagonal tensor.
 
 ```julia
-T = zeros(Float64, 5, 5, 5, 5);
-for i in 1:5; T[i, i, i, i] = 2 * i; end
+dim = 5;
+T = zeros(Float64, dim, dim, dim, dim);
+for i in 1:dim; T[i, i, i, i] = 2 * (dim + 1 - i); end
 ```
 
 (2) A function that maps a matrix to one of its eigenvectors. 
@@ -36,6 +37,7 @@ We include several maps by default, such as the following (see `eval_maps.jl`).
 ```julia
 Map1 = largest_algebraic(); # evec for largest algebraic eval
 Map2 = kth_smallest_magnitude(2); # evec for second smallest eval in magnitude
+Map3 = closest_in_angle(eye(dim)[:,2]); # evec closest to second standard basis vector
 ```
 
 (3) A numerical integrator function `integrator(f, x)`. The function takes as input a derivative function f and the current iterate x. The derivative function maps a vector to a vector. The integrator function must return the next iterate, given the current iterate and access to the derivative function.
@@ -43,42 +45,51 @@ Map2 = kth_smallest_magnitude(2); # evec for second smallest eval in magnitude
 We provide some numerical integrators with the code, so you don't have to worry about all of those details.
 
 ```julia
-Integrator1 = forward_euler(1.0);  # explicit forward Euler with step size 1.0
-Integrator2 = forward_euler(0.5);  # explicit forward Euler with step size 0.5
-Integrator3 = RK4(0.75);           # fourth-order explicit Runge-Kutta with step size 0.75
+Integrator1 = forward_euler(1.0); # explicit forward Euler with step size 1.0
+Integrator2 = forward_euler(0.5); # explicit forward Euler with step size 0.5
+Integrator3 = RK4(0.75); # fourth-order explicit Runge-Kutta with step size 0.75
 ```
 
 With our eigenvector map and numerical integrator in hand, we can now compute Z eigenvectors!
 
 ```julia
-(evals, evecs) = TZE_dynsys(T, Map1, Integrator2)
+(evals, evecs, converged) = TZE_dynsys(T, Map3, Integrator2)
 ```
 
-The vector `evals` contains the Rayleigh quotients at each iteration. The columns of `evecs` are the iterates of the numerical integration scheme.
+The vector `evals` contains the Rayleigh quotients at each iteration. The columns of `evecs` are the iterates of the numerical integration scheme. The boolean converged indicates whether or not the numerical integration converged to a tenzor Z-eigenvector.
 
 Here's how we could get all of the eigenvalues for this diagonal tensor.
 
 ```julia
-FE = forward_euler(1.0)
+FE = forward_euler(0.5)
 for k in 1:5
-	(evals, evecs) = TZE_dynsys(T, kth_largest_algebraic(k), FE); 
-    println(evals[end], " ", evecs[:, end])
+	(evals, evecs, conv) = TZE_dynsys(T, closest_in_angle(eye(dim)[:,k]), FE); 
+	println("converged = $conv");
+    println("eval = $(evals[end])");
+    println("evec = $(evecs[:,end])");    
 end
 ```
 
 
 
-## Reproduce the figures and tables in the paper
+#### Reproduce the figures in the paper
 
 ```julia
 include("paper_plots.jl")
 
-plots_36(0.0018)
-plots_36(0.0033)
-plots_36(0.2294)
+# Figure 2
+example_36(0.0018)
+example_36(0.0033)
+example_36(0.2294)
 
-plots_411(9.9779)
-plots_411(0.0000)
-plots_411(4.2876)
+# Figure 3
+example_411(9.9779)
+example_411(0.0000)
+example_411(4.2876)
+
+# Figure 4
+scalability(3)
+scalability(4)
+scalability(5)
 ```
 

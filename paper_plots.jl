@@ -37,7 +37,7 @@ function T_36()
     return T
 end
 
-function plots_36(eigenvalue::Float64)
+function example_36(eigenvalue::Float64)
     srand(1)
     T = T_36()
     maxiter = 20
@@ -88,7 +88,7 @@ function T_411(n::Int64)
     return A
 end
 
-function plots_411(eigenvalue::Float64)
+function example_411(eigenvalue::Float64)
     T = T_411(5)
     maxiter = 20
     tol = -1.0  # negative to run all of the iterations
