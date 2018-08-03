@@ -132,7 +132,7 @@ end
 function scalability(order::Int64)
     function get_time(method::String, dim::Int64)
         endstr = "evals-$order-$dim.mat"
-        if method == "DS";     return matread("results/TZE-$(endstr)")["time"];           end
+        if method == "DS";     return matread("results/DS-$(endstr)")["time"];           end
         if method == "SDP";    return matread("SDP/results/SDP-$(endstr)")["time"];       end
         if method == "SSHOPM"; return matread("SSHOPM/results/SSHOPM-$(endstr)")["time"]; end
         error("Unknown method $method")
@@ -163,7 +163,7 @@ function unique_evals(order::Int64)
     function get_evals(method::String, dim::Int64)
         endstr = "evals-$order-$dim.mat"
         evals = Float64[]
-        if     method == "DS";     evals = matread("results/TZE-$(endstr)")["evals"]
+        if     method == "DS";     evals = matread("results/DS-$(endstr)")["evals"]
         elseif method == "SDP";    evals = matread("SDP/results/SDP-$(endstr)")["evals"]
         elseif method == "SSHOPM"; evals = matread("SSHOPM/results/SSHOPM-$(endstr)")["evals"]
         else   error("Unknown method $method");
