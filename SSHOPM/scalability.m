@@ -1,6 +1,6 @@
 addpath('/Users/arb/codes/TZE-dynsys/SSHOPM/tensor_toolbox-master');
 basertrials = 50;
-tol = 1e-4;
+tol = 1e-6;
 shift = 1;
 
 %%

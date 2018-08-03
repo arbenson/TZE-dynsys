@@ -35,7 +35,7 @@ function run_test(dim::Int64, order::Int64)
     srand(1234)
     T = test_tensor(dim, order)
     num_trials = 50
-    tol = 1e-4
+    tol = 1e-6
     maxiter = 50
 
     FE = forward_euler(0.5)
