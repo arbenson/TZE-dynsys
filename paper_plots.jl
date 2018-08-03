@@ -134,20 +134,20 @@ function scalability(order::Int64)
         endstr = "evals-$order-$dim.mat"
         if method == "DS";     return matread("results/DS-$(endstr)")["time"];           end
         if method == "SDP";    return matread("SDP/results/SDP-$(endstr)")["time"];       end
-        if method == "SSHOPM"; return matread("SSHOPM/results/SSHOPM-$(endstr)")["time"]; end
+        if method == "SS-HOPM"; return matread("SS-HOPM/results/SS-HOPM-$(endstr)")["time"]; end
         error("Unknown method $method")
     end
 
     close()
     fsz=24
-    dims = 5:12
+    dims = 5:13
     ds_times     = [get_time("DS",     dim) for dim in dims]
     sdp_times    = [get_time("SDP",    dim) for dim in dims]
-    sshopm_times = [get_time("SSHOPM", dim) for dim in dims]    
+    sshopm_times = [get_time("SS-HOPM", dim) for dim in dims]    
 
     semilogy(collect(dims), ds_times,     lw=1.5, marker="s", label="DS")
     semilogy(collect(dims), sdp_times,    lw=1.5, marker="o", label="SDP")
-    semilogy(collect(dims), sshopm_times, lw=1.5, marker="x", label="SSHOPM")
+    semilogy(collect(dims), sshopm_times, lw=1.5, marker="x", label="SS-HOPM")
     xlabel("Dimension", fontsize=fsz)
     ylabel("Running time (seconds)", fontsize=fsz)
     legend(fontsize=fsz-4, loc="upper left", frameon=false)
@@ -165,7 +165,7 @@ function unique_evals(order::Int64)
         evals = Float64[]
         if     method == "DS";     evals = matread("results/DS-$(endstr)")["evals"]
         elseif method == "SDP";    evals = matread("SDP/results/SDP-$(endstr)")["evals"]
-        elseif method == "SSHOPM"; evals = matread("SSHOPM/results/SSHOPM-$(endstr)")["evals"]
+        elseif method == "SS-HOPM"; evals = matread("SS-HOPM/results/SS-HOPM-$(endstr)")["evals"]
         else   error("Unknown method $method");
         end
         evals = vec(evals)
@@ -186,6 +186,6 @@ function unique_evals(order::Int64)
 
     @show get_evals("SDP", 7)
     @show get_evals("DS", 7)
-    @show get_evals("SSHOPM", 7)
+    @show get_evals("SS-HOPM", 7)
 end
 ;

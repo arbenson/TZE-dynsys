@@ -1,4 +1,4 @@
-addpath('/Users/arb/codes/TZE-dynsys/SSHOPM/tensor_toolbox-master');
+addpath('/Users/arb/codes/TZE-dynsys/SS-HOPM/tensor_toolbox-master');
 basetrials = 50;
 maxiter = 100;
 tol = 1e-6;
@@ -29,7 +29,7 @@ for dim = 5:15
     end
     time = toc(begintime);
     evals = evals(successes == 1);
-    save(sprintf('results/SSHOPM-evals-%d-%d.mat', order, dim), ...
+    save(sprintf('results/SS-HOPM-evals-%d-%d.mat', order, dim), ...
          'evals', 'time', 'dim', 'order');
 end
 
@@ -60,7 +60,7 @@ for dim = 5:15
     end
     time = toc(begintime);
     evals = evals(successes == 1);
-    save(sprintf('results/SSHOPM-evals-%d-%d.mat', order, dim), ...
+    save(sprintf('results/SS-HOPM-evals-%d-%d.mat', order, dim), ...
          'evals', 'time', 'dim', 'order');
 end
 
@@ -93,6 +93,6 @@ for dim = 5:15
     end
     time = toc(begintime);
     evals = evals(successes == 1);
-    save(sprintf('results/SSHOPM-evals-%d-%d.mat', order, dim), ...
+    save(sprintf('results/SS-HOPM-evals-%d-%d.mat', order, dim), ...
          'evals', 'time', 'dim', 'order');
 end
