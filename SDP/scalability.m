@@ -18,7 +18,6 @@ for dim = 13:15
     end
 
     begintime = tic;
-    profile on
     [evals, eigvec, info] = AReigSTensors(f_A, [], mpol(x), order, p, []);
     time = toc(begintime);
     save(sprintf('results/SDP-evals-%d-%d.mat', order, dim), ...
@@ -45,7 +44,6 @@ for dim = 5:15
     end
 
     begintime = tic;
-    profile on
     [evals, eigvec, info] = AReigSTensors(f_A, [], mpol(x), order, p, []);
     time = toc(begintime);
     save(sprintf('results/SDP-evals-%d-%d.mat', order, dim), ...
@@ -74,7 +72,6 @@ for dim = 5:15
     end
 
     begintime = tic;
-    profile on
     [evals, eigvec, info] = AReigSTensors(f_A, [], mpol(x), order, p, []);
     time = toc(begintime);
     save(sprintf('results/SDP-evals-%d-%d.mat', order, dim), ...

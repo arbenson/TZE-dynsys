@@ -36,7 +36,7 @@ function run_test(dim::Int64, order::Int64)
     T = test_tensor(dim, order)
     num_trials = 50
     tol = 1e-6
-    maxiter = 50
+    maxiter = 100
 
     FE = forward_euler(0.5)
     all_evals = Float64[]
@@ -61,13 +61,13 @@ function main()
         dimensions = Int64[]
         times = Float64[]
         all_evals = Vector{Vector{Float64}}()
+        # Warm-up compilation
+        evals = run_test(10, order);
         for dimension in 5:15
             println("\t$(dimension)...")
-            evals = run_test(dimension, order);
             tic();
             run_test(dimension, order);
             time = toq();
-            
             # Record data
             matwrite("results/DS-evals-$order-$(dimension).mat",
                      Dict("order"     => order,

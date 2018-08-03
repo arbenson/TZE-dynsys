@@ -139,7 +139,7 @@ function scalability(order::Int64)
     end
 
     close()
-    fsz=20
+    fsz=24
     dims = 5:12
     ds_times     = [get_time("DS",     dim) for dim in dims]
     sdp_times    = [get_time("SDP",    dim) for dim in dims]
