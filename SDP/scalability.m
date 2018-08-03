@@ -1,11 +1,11 @@
 addpath('/Users/arb/codes/TZE-dynsys/SDP/AReigSTensors');
-addpath('/Users/arb/codes/TZE-dynsys/SDP/sedumi-master/');
+addpath('/Users/arb/codes/TZE-dynsys/SDP/sedumi-master');
 addpath('/Users/arb/codes/TZE-dynsys/SDP/gloptipoly3');
 %%
 order = 3;  % order of tensor
 p = 2;      % z-eigenvector
 
-for dim = 13:15
+for dim = 5:15
     mpol('x', dim);
     f_A = x(1)^0 - 1;  % start with 0 polynomial
     for i = 1:dim
