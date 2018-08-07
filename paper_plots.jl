@@ -132,25 +132,37 @@ end
 function scalability(order::Int64)
     function get_time(method::String, dim::Int64)
         endstr = "evals-$order-$dim.mat"
-        if method == "DS";     return matread("results/DS-$(endstr)")["time"];           end
-        if method == "SDP";    return matread("SDP/results/SDP-$(endstr)")["time"];       end
+        if method == "DS";      return matread("results/DS-$(endstr)")["time"];              end
+        if method == "SDP";     return matread("SDP/results/SDP-$(endstr)")["time"];         end
         if method == "SS-HOPM"; return matread("SS-HOPM/results/SS-HOPM-$(endstr)")["time"]; end
+    end
+    function get_times(method::String, dims::UnitRange{Int64})
+        if method == "DS";      return [get_time("DS",     dim) for dim in dims];  end
+        if method == "SDP";     return [get_time("SDP",    dim) for dim in dims];  end
+        if method == "SS-HOPM"; return [get_time("SS-HOPM", dim) for dim in dims]; end
         error("Unknown method $method")
     end
 
-    close()
-    fsz=24
-    dims = 5:13
-    ds_times     = [get_time("DS",     dim) for dim in dims]
-    sdp_times    = [get_time("SDP",    dim) for dim in dims]
-    sshopm_times = [get_time("SS-HOPM", dim) for dim in dims]    
+    ds_dims = 5:15
+    sshopm_dims = 5:15
+    sdp_dims = 5:15
+    if order == 5; sdp_dims = 5:10; end
+    
+    ds_times     = get_times("DS",      ds_dims)
+    sshopm_times = get_times("SS-HOPM", sshopm_dims)
+    sdp_times    = get_times("SDP",     sdp_dims)
 
-    semilogy(collect(dims), ds_times,     lw=1.5, marker="s", label="DS")
-    semilogy(collect(dims), sdp_times,    lw=1.5, marker="o", label="SDP")
-    semilogy(collect(dims), sshopm_times, lw=1.5, marker="x", label="SS-HOPM")
+    close()
+    fsz = 24
+    semilogy(collect(ds_dims),     ds_times,     lw=1.5, marker="s", label="DS")
+    semilogy(collect(sshopm_dims), sshopm_times, lw=1.5, marker="x", label="SS-HOPM")
+    semilogy(collect(sdp_dims),    sdp_times,    lw=1.5, marker="o", label="SDP")
     xlabel("Dimension", fontsize=fsz)
     ylabel("Running time (seconds)", fontsize=fsz)
-    legend(fontsize=fsz-4, loc="upper left", frameon=false)
+    if order == 3
+        legend(fontsize=fsz-4, loc="upper left", frameon=false,
+               labelspacing=0.25)
+    end
     title("Order-$(order) tensors", fontsize=fsz)
     ax = gca()
     ax[:tick_params]("both", labelsize=fsz-4, length=6, width=1.5)

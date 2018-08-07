@@ -86,5 +86,10 @@ example_36(0.2294)
 example_411(9.9779)
 example_411(0.0000)
 example_411(4.2876)
+
+# Figure 4
+scalability(3)
+scalability(4)
+scalability(5)
 ```
 
