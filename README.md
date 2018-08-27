@@ -35,9 +35,14 @@ for i in 1:dim; T[i, i, i, i] = 2 * (dim + 1 - i); end
 We include several maps by default, such as the following (see `eval_maps.jl`).
 
 ```julia
-Map1 = largest_algebraic(); # evec for largest algebraic eval
-Map2 = kth_smallest_magnitude(2); # evec for second smallest eval in magnitude
-Map3 = closest_in_angle(eye(dim)[:,2]); # evec closest to second standard basis vector
+# evec for largest algebraic eval
+Map1 = largest_algebraic();
+
+# evec for second smallest eval in magnitude
+Map2 = kth_smallest_magnitude(2); 
+
+# evec closest to second standard basis vector
+Map3 = closest_in_angle(Array(Diagonal(ones(dim))[:,2])); 
 ```
 
 (3) A numerical integrator function `integrator(f, x)`. The function takes as input a derivative function f and the current iterate x. The derivative function maps a vector to a vector. The integrator function must return the next iterate, given the current iterate and access to the derivative function.
@@ -63,7 +68,8 @@ Here's how we could get all of the eigenvalues for this diagonal tensor.
 ```julia
 FE = forward_euler(0.5)
 for k in 1:5
-	(evals, evecs, conv) = TZE_dynsys(T, closest_in_angle(eye(dim)[:,k]), FE); 
+	(evals, evecs, conv) = 
+    	TZE_dynsys(T, closest_in_angle(Array(Diagonal(ones(dim))[:,k])), FE); 
 	println("converged = $conv");
     println("eval = $(evals[end])");
     println("evec = $(evecs[:,end])");    

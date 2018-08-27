@@ -2,6 +2,8 @@ include("tensor.jl")
 include("integrators.jl")
 include("eval_maps.jl")
 
+using LinearAlgebra
+
 """
 TZE_dynsys
 -------------

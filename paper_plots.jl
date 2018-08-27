@@ -175,8 +175,8 @@ function unique_evals(order::Int64)
     function get_evals(method::String, dim::Int64)
         endstr = "evals-$order-$dim.mat"
         evals = Float64[]
-        if     method == "DS";     evals = matread("results/DS-$(endstr)")["evals"]
-        elseif method == "SDP";    evals = matread("SDP/results/SDP-$(endstr)")["evals"]
+        if     method == "DS";      evals = matread("results/DS-$(endstr)")["evals"]
+        elseif method == "SDP";     evals = matread("SDP/results/SDP-$(endstr)")["evals"]
         elseif method == "SS-HOPM"; evals = matread("SS-HOPM/results/SS-HOPM-$(endstr)")["evals"]
         else   error("Unknown method $method");
         end
