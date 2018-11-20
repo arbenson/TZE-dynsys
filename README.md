@@ -4,9 +4,21 @@ This code and data repository accompanies the paper
 
 - Computing tensor Z-eigenvectors with dynamical systems. Austin R. Benson and David F. Gleich. [*arXiv:1805.00903*](http://arxiv.org/abs/arXiv:1805.00903), 2018.
 
-All of the code is written in Julia.
+All of the code is written in Julia 1.0.
 
 For questions, please email Austin at arb@cs.cornell.edu.
+
+### Setup
+
+This code uses Julia 1.0. It relies on having the following packages installed:
+
+```julia
+using Pkg
+Pkg.add("Combinatorics")
+Pkg.add("FileIO")
+Pkg.add("JLD2")
+Pkg.add("PyPlot")
+```
 
 
 
