@@ -1,3 +1,5 @@
+using LinearAlgebra
+
 function safer_sign(v::Vector{Float64})
     sgn = sign(v[2])
     if sgn == 0.0; return 1.0; end
@@ -5,7 +7,8 @@ function safer_sign(v::Vector{Float64})
 end
 
 function _kth_largest_algebraic(M::Array{Float64,2}, k::Int64)
-    (d, V) = eig(M)
+    F = eigen(M)
+    d, V = F.values, F.vectors
     j = sortperm(real.(d), rev=true)[k]
     v = real.(V[:, j])
     return v * safer_sign(v)
@@ -20,7 +23,8 @@ function largest_algebraic()
 end
 
 function _kth_smallest_algebraic(M::Array{Float64,2}, k::Int64)
-    (d, V) = eig(M)
+    F = eigen(M)
+    d, V = F.values, F.vectors
     j = sortperm(real.(d))[k]
     v = real.(V[:, j])
     return v * safer_sign(v)
@@ -35,7 +39,8 @@ function smallest_algebraic()
 end
 
 function _kth_largest_magnitude(M::Array{Float64,2}, k::Int64)
-    (d, V) = eig(M)
+    F = eigen(M)
+    d, V = F.values, F.vectors
     j = sortperm(abs.(d), rev=true)[k]
     v = real.(V[:, j])
     return v * safer_sign(v)    
@@ -50,7 +55,8 @@ function largest_magnitude()
 end
 
 function _kth_smallest_magnitude(M::Array{Float64,2}, k::Int64)
-    (d, V) = eig(M)
+    F = eigen(M)
+    d, V = F.values, F.vectors
     j = sortperm(abs.(d))[k]
     v = real.(V[:, j])
     return v * safer_sign(v)    
@@ -65,7 +71,7 @@ function smallest_magnitude()
 end
 
 function _closest_in_angle(M::Array{Float64,2}, x::Vector{Float64})
-    (d, V) = eig(M)
+    V = eigen(M).vectors
     angles = abs.(vec(x' * V))
     j = findmax(angles)[2]
     v = real.(V[:, j])

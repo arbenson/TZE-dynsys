@@ -1,14 +1,16 @@
 include("dynsys.jl")
 
 using Combinatorics
-using MAT
+using FileIO
+using JLD2
 using PyPlot
+using Random
 
 # Tensor in Example 3.6 from Kolda and Mayo. "Shifted power method for computing
 # tensor eigenpairs." SIMAX, 2011.
 function T_36()
     function symtensor(T::Array{Float64})
-        S = zeros(T)
+        S = zeros(Float64, size(T)...)
         d = ndims(T)
         for p in permutations(1:d)
             S += permutedims(T,p)
@@ -38,7 +40,7 @@ function T_36()
 end
 
 function example_36(eigenvalue::Float64)
-    srand(1)
+    Random.seed!(1)
     T = T_36()
     maxiter = 20
 
@@ -131,10 +133,10 @@ end
 
 function scalability(order::Int64)
     function get_time(method::String, dim::Int64)
-        endstr = "evals-$order-$dim.mat"
-        if method == "DS";      return matread("results/DS-$(endstr)")["time"];              end
-        if method == "SDP";     return matread("SDP/results/SDP-$(endstr)")["time"];         end
-        if method == "SS-HOPM"; return matread("SS-HOPM/results/SS-HOPM-$(endstr)")["time"]; end
+        endstr = "evals-$order-$dim.jld2"
+        if method == "DS";      return load("results/DS-$(endstr)")["time"];              end
+        if method == "SDP";     return load("SDP/results/SDP-$(endstr)")["time"];         end
+        if method == "SS-HOPM"; return load("SS-HOPM/results/SS-HOPM-$(endstr)")["time"]; end
     end
     function get_times(method::String, dims::UnitRange{Int64})
         if method == "DS";      return [get_time("DS",     dim) for dim in dims];  end
@@ -173,11 +175,11 @@ end
 
 function unique_evals(order::Int64)
     function get_evals(method::String, dim::Int64)
-        endstr = "evals-$order-$dim.mat"
+        endstr = "evals-$order-$dim.jld2"
         evals = Float64[]
-        if     method == "DS";     evals = matread("results/DS-$(endstr)")["evals"]
-        elseif method == "SDP";    evals = matread("SDP/results/SDP-$(endstr)")["evals"]
-        elseif method == "SS-HOPM"; evals = matread("SS-HOPM/results/SS-HOPM-$(endstr)")["evals"]
+        if     method == "DS";      evals = load("results/DS-$(endstr)")["evals"]
+        elseif method == "SDP";     evals = load("SDP/results/SDP-$(endstr)")["evals"]
+        elseif method == "SS-HOPM"; evals = load("SS-HOPM/results/SS-HOPM-$(endstr)")["evals"]
         else   error("Unknown method $method");
         end
         evals = vec(evals)
