@@ -96,18 +96,18 @@ end
 include("paper_plots.jl")
 
 # Figure 2
-example_36(0.0018)
-example_36(0.0033)
-example_36(0.2294)
+example_36(0.0018)  # --> ex36-V5-0018.eps
+example_36(0.0033)  # --> ex36-V5-0033.eps
+example_36(0.2294)  # --> ex36-V5-2294.eps
 
 # Figure 3
-example_411(9.9779)
-example_411(0.0000)
-example_411(4.2876)
+example_411(9.9779) # --> ex411-V1.eps
+example_411(0.0000) # --> ex411-V2.eps
+example_411(4.2876) # --> ex411-V3.eps
 
 # Figure 4
-scalability(3)
-scalability(4)
-scalability(5)
+scalability(3)  # --> scalability-3.eps 
+scalability(4)  # --> scalability-4.eps
+scalability(5)  # --> scalability-5.eps
 ```
 
