@@ -1,5 +1,5 @@
 include("dynsys.jl")
-using MAT
+using FileIO, JLD2
 
 function test_tensor(dim::Int64, order::Int64)
     if order == 3
@@ -69,11 +69,11 @@ function main()
             run_test(dimension, order);
             time = toq();
             # Record data
-            matwrite("results/DS-evals-$order-$(dimension).mat",
-                     Dict("order"     => order,
-                          "dimension" => dimension,
-                          "time"      => time,
-                          "evals"     => evals))            
+            save("results/DS-evals-$order-$(dimension).mat",
+                 Dict("order"     => order,
+                      "dimension" => dimension,
+                      "time"      => time,
+                      "evals"     => evals))            
         end
     end
 end
