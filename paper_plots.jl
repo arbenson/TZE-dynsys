@@ -90,7 +90,7 @@ function T_411(n::Int64)
     return A
 end
 
-function example_411(eigenvalue::Float64)
+function example_411(eigenvalue::Float64, eval_map)
     T = T_411(5)
     maxiter = 20
     tol = -1.0  # negative to run all of the iterations
@@ -105,23 +105,35 @@ function example_411(eigenvalue::Float64)
     figname = ""
 
     if eigenvalue == 9.9779
-        quotients, xhist = TZE_dynsys(T, largest_magnitude(), FE, x0=x0, tol=tol, maxiter=maxiter)
+        quotients, xhist = TZE_dynsys(T, eval_map(), FE, x0=x0, tol=tol, maxiter=maxiter)
         plot(-quotients, marker="o", lw=3)
         title("V1 (λ = 9.9779)", fontsize=fsz)
         ylim(5, 10.5)
         figname = "ex411-V1.eps"
     elseif eigenvalue == 0.0000
-        quotients, xhist = TZE_dynsys(T, smallest_magnitude(), FE, x0=x0, tol=tol, maxiter=maxiter)
+        quotients, xhist = TZE_dynsys(T, eval_map(), FE, x0=x0, tol=tol, maxiter=maxiter)
         plot(quotients, marker="o", lw=3)
         title("V2 (λ = 0.0000)", fontsize=fsz)
         ylim(-5.5, 0.5)
         figname = "ex411-V2.eps"
     elseif eigenvalue == 4.2876
-        quotients, xhist = TZE_dynsys(T, largest_algebraic(), FE, x0=x0, tol=tol, maxiter=maxiter)
-        plot(quotients, marker="o", lw=3)
-        title("V3 (λ = 4.2876)", fontsize=fsz)
-        ylim(-6, 5)
-        figname = "ex411-V3.eps"
+        if eval_map == largest_algebraic
+            quotients, xhist = TZE_dynsys(T, eval_map(), FE, x0=x0, tol=tol, maxiter=maxiter)
+            plot(quotients, marker="o", lw=3)
+            title("V3 (λ = 4.2876)", fontsize=fsz)
+            ylim(-6, 5)
+            figname = "ex411-V3.eps"
+        end
+        if map == largest_magnitude
+            Random.seed!(123456)
+            x0 = normalize(randn(Float64, size(T)[1]))
+            quotients, xhist = TZE_dynsys(T, eval_map(), FE, x0=x0, tol=tol, maxiter=maxiter)
+            @show minimum(quotients), maximum(quotients)
+            plot(quotients, marker="o", lw=3)
+            title("V1 (λ = 4.2876)", fontsize=fsz)
+            ylim(2.5, 4.5)
+            figname = "ex411-V1-2.eps"
+        end
     else
         error("Unkown eigenvalue")
     end
@@ -156,9 +168,9 @@ function scalability(order::Int64)
 
     close()
     fsz = 24
-    semilogy(collect(ds_dims),     ds_times,     lw=1.5, marker="s", label="DS")
-    semilogy(collect(sshopm_dims), sshopm_times, lw=1.5, marker="x", label="SS-HOPM")
-    semilogy(collect(sdp_dims),    sdp_times,    lw=1.5, marker="o", label="SDP")
+    semilogy(collect(ds_dims),     ds_times,     lw=2.5, ls="--",  marker="s", ms=8, label="DS")
+    semilogy(collect(sshopm_dims), sshopm_times, lw=2.5, ls=":", marker="x", ms=8, label="SS-HOPM")
+    semilogy(collect(sdp_dims),    sdp_times,    lw=2.5, ls="-",  marker="o", ms=8, label="SDP")
     xlabel("Dimension", fontsize=fsz)
     ylabel("Running time (seconds)", fontsize=fsz)
     if order == 3

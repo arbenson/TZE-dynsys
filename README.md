@@ -101,9 +101,10 @@ example_36(0.0033)  # --> ex36-V5-0033.eps
 example_36(0.2294)  # --> ex36-V5-2294.eps
 
 # Figure 3
-example_411(9.9779) # --> ex411-V1.eps
-example_411(0.0000) # --> ex411-V2.eps
-example_411(4.2876) # --> ex411-V3.eps
+example_411(9.9779, largest_magnitude)  # --> ex411-V1.eps
+example_411(4.2876, largest_magnitude)  # --> ex411-V1-2.eps
+example_411(0.0000, smallest_magnitude) # --> ex411-V2.eps
+example_411(4.2876, largest_algebraic)  # --> ex411-V3.eps
 
 # Figure 4
 scalability(3)  # --> scalability-3.eps 
