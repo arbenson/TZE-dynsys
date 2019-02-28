@@ -6,6 +6,58 @@ using JLD2
 using PyPlot
 using Random
 
+function stability()
+    T = zeros(Float64, 3, 3, 3)
+    T[1, 1, 1] = 5
+    T[2, 2, 2] = 2
+    T[3, 3, 3] = 1
+    
+    x1s, x2s = Float64[], Float64[]
+    us_u, vs_u = Float64[], Float64[]
+    us_s, vs_s = Float64[], Float64[]    
+
+    close()
+    map1 = smallest_algebraic()
+    map2 = closest_in_angle([0.0, 0.0, 1.0])
+    scatter([0, 1, 0], [0, 0, 1], marker="x", s=100, color="#e41a1c")    
+    for r in range(0.02, 1.0, length=15)
+        nsamp = max(convert(Int64, round(150 * r)), 4)
+        for θ in range(0.0, 2 * π, length=nsamp)
+            x1 = r * cos(θ)
+            x2 = r * sin(θ)
+            if x1^2 + x2^2 <= 1.0001
+                push!(x1s, x1);  push!(x2s, x2)
+                x3 = sqrt(abs.(1 - x1^2 - x2^2))
+                x = [x1, x2, x3]
+                g = map1(collapse(T, x)) - x
+                push!(us_u, g[1]); push!(vs_u, g[2])
+                g = map2(collapse(T, x)) - x                
+                push!(us_s, g[1]); push!(vs_s, g[2])
+            end
+        end
+    end
+    quiver(x1s, x2s, us_u, vs_u, headwidth=2, headlength=3, minshaft=2)
+    xlabel(L"$x_1$")
+    ylabel(L"$x_2$")
+    title("Largest algebraic")
+    ax = gca()
+    ax[:set_xlim](-1.1, 1.1)
+    ax[:set_ylim](-1.1, 1.1)
+    savefig("largest_alg.pdf")
+
+    figure()
+    scatter([0, 1, 0], [0, 0, 1], marker="x", s=100, color="#e41a1c")
+    quiver(x1s, x2s, us_s, vs_s, headwidth=2, headlength=3, minshaft=2)    
+    xlabel(L"$x_1$")
+    ylabel(L"$x_2$")
+    title("Closest to [0, 0, 1]")
+    ax = gca()
+    ax[:set_xlim](-1.1, 1.1)
+    ax[:set_ylim](-1.1, 1.1)
+    savefig("closest.pdf")
+end
+
+
 # Tensor in Example 3.6 from Kolda and Mayo. "Shifted power method for computing
 # tensor eigenpairs." SIMAX, 2011.
 function T_36()
