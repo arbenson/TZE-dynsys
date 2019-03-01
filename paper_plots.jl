@@ -6,7 +6,56 @@ using JLD2
 using PyPlot
 using Random
 
-function stability()
+function stability1()
+    T = zeros(Float64, 3, 3, 3)
+    T[1, 1, 1] = 5
+    T[2, 2, 2] = 2
+    T[3, 3, 3] = 1
+    
+    x1s, x2s = Float64[], Float64[]
+    us, vs = Float64[], Float64[]
+
+    close()
+    eval_map = smallest_algebraic()
+    scatter([0, 1, 0], [0, 0, 1], marker="x", s=100, color="#e41a1c")    
+    for r in range(0.02, 1.0, length=15)
+        nsamp = max(convert(Int64, round(150 * r)), 4)
+        for θ in range(0.0, 2 * π, length=nsamp)
+            x1 = r * cos(θ)
+            x2 = r * sin(θ)
+            if x1^2 + x2^2 <= 1.0001
+                push!(x1s, x1);  push!(x2s, x2)
+                x3 = sqrt(abs.(1 - x1^2 - x2^2))
+                x = [x1, x2, x3]
+                g = eval_map(collapse(T, x)) - x
+                push!(us, g[1]); push!(vs, g[2])
+            end
+        end
+    end
+
+    # example trajectory
+    eval_hist, evec_hist, conv =
+        TZE_dynsys(T, eval_map, forward_euler(0.05),
+                   x0=[0.5, -0.5, 1 - sqrt(0.5)], maxiter=50)
+    t1 = vec(evec_hist[1,:])
+    t2 = vec(evec_hist[2,:])
+    plot(t1, t2, color="blue", lw=0.5, marker=".", ms=1)
+    
+    fsz = 22
+    quiver(x1s, x2s, us, vs, headwidth=2, headlength=3, minshaft=2)
+    xlabel(L"$x_1$", fontsize=fsz)
+    ylabel(L"$x_2$", fontsize=fsz)
+    title("Largest algebraic", fontsize=fsz)
+    ax = gca()
+    ax[:set_xlim](-1.1, 1.1)
+    ax[:set_ylim](-1.1, 1.1)
+    ax[:tick_params]("both", labelsize=fsz, length=5, width=1.5)
+    tight_layout()
+    savefig("largest_alg.eps")
+end
+
+#=
+function stability2()
     T = zeros(Float64, 3, 3, 3)
     T[1, 1, 1] = 5
     T[2, 2, 2] = 2
@@ -61,6 +110,8 @@ function stability()
     tight_layout()
     savefig("closest.eps")
 end
+=#
+
 
 # Tensor in Example 3.6 from Kolda and Mayo. "Shifted power method for computing
 # tensor eigenpairs." SIMAX, 2011.
