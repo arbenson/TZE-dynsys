@@ -36,27 +36,31 @@ function stability()
             end
         end
     end
+    fsz = 22
     quiver(x1s, x2s, us_u, vs_u, headwidth=2, headlength=3, minshaft=2)
-    xlabel(L"$x_1$")
-    ylabel(L"$x_2$")
-    title("Largest algebraic")
+    xlabel(L"$x_1$", fontsize=fsz)
+    ylabel(L"$x_2$", fontsize=fsz)
+    title("Largest algebraic", fontsize=fsz)
     ax = gca()
     ax[:set_xlim](-1.1, 1.1)
     ax[:set_ylim](-1.1, 1.1)
-    savefig("largest_alg.pdf")
+    ax[:tick_params]("both", labelsize=fsz, length=5, width=1.5)
+    tight_layout()
+    savefig("largest_alg.eps")
 
     figure()
     scatter([0, 1, 0], [0, 0, 1], marker="x", s=100, color="#e41a1c")
     quiver(x1s, x2s, us_s, vs_s, headwidth=2, headlength=3, minshaft=2)    
-    xlabel(L"$x_1$")
-    ylabel(L"$x_2$")
-    title("Closest to [0, 0, 1]")
+    xlabel(L"$x_1$", fontsize=fsz)
+    ylabel(L"$x_2$", fontsize=fsz)
+    title("Closest to [0, 0, 1]", fontsize=fsz)
     ax = gca()
     ax[:set_xlim](-1.1, 1.1)
     ax[:set_ylim](-1.1, 1.1)
-    savefig("closest.pdf")
+    ax[:tick_params]("both", labelsize=fsz, length=5, width=1.5)
+    tight_layout()
+    savefig("closest.eps")
 end
-
 
 # Tensor in Example 3.6 from Kolda and Mayo. "Shifted power method for computing
 # tensor eigenpairs." SIMAX, 2011.
