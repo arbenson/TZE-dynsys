@@ -55,14 +55,14 @@ function stability(eval_map, x0::Vector{Float64},
     ax = gca()
     ax[:scatter](t1, t2, c=collect(1:length(t1)) / length(t1), cmap="hot", s=2)
 
-    fsz = 22
-    xlabel(L"$x_1$", fontsize=fsz)
-    ylabel(L"$x_2$", fontsize=fsz)
+    fsz = 20
+    xlabel(L"$x_1$", fontsize=fsz+2)
+    ylabel(L"$x_2$", fontsize=fsz+2)
     title(title_str, fontsize=fsz)
     ax = gca()
     ax[:set_xlim](-1.1, 1.1)
     ax[:set_ylim](-1.1, 1.1)
-    ax[:tick_params]("both", labelsize=fsz, length=5, width=1.5)
+    ax[:tick_params]("both", labelsize=fsz-2, length=5, width=1.5)
     tight_layout()
     savefig(filename)
 end
