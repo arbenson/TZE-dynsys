@@ -42,7 +42,7 @@ T = zeros(Float64, dim, dim, dim, dim);
 for i in 1:dim; T[i, i, i, i] = 2 * (dim + 1 - i); end
 ```
 
-(2) A function that maps a matrix to one of its eigenvectors. 
+(2) A function that maps a matrix to one of its eigenvectors.
 
 We include several maps by default, such as the following (see `eval_maps.jl`).
 
@@ -51,10 +51,10 @@ We include several maps by default, such as the following (see `eval_maps.jl`).
 Map1 = largest_algebraic();
 
 # evec for second smallest eval in magnitude
-Map2 = kth_smallest_magnitude(2); 
+Map2 = kth_smallest_magnitude(2);
 
 # evec closest to second standard basis vector
-Map3 = closest_in_angle(Array(Diagonal(ones(dim))[:,2])); 
+Map3 = closest_in_angle(Array(Diagonal(ones(dim))[:,2]));
 ```
 
 (3) A numerical integrator function `integrator(f, x)`. The function takes as input a derivative function f and the current iterate x. The derivative function maps a vector to a vector. The integrator function must return the next iterate, given the current iterate and access to the derivative function.
@@ -80,8 +80,8 @@ Here's how we could get all of the eigenvalues for this diagonal tensor.
 ```julia
 FE = forward_euler(0.5)
 for k in 1:5
-	(evals, evecs, conv) = 
-    	TZE_dynsys(T, closest_in_angle(Array(Diagonal(ones(dim))[:,k])), FE); 
+	(evals, evecs, conv) =
+    	TZE_dynsys(T, closest_in_angle(Array(Diagonal(ones(dim))[:,k])), FE);
 	println("converged = $conv");
     println("eval = $(evals[end])");
     println("evec = $(evecs[:,end])");    
@@ -107,8 +107,14 @@ example_411(0.0000, smallest_magnitude) # --> ex411-V2.eps
 example_411(4.2876, largest_algebraic)  # --> ex411-V3.eps
 
 # Figure 4
-scalability(3)  # --> scalability-3.eps 
+scalability(3)  # --> scalability-3.eps
 scalability(4)  # --> scalability-4.eps
 scalability(5)  # --> scalability-5.eps
 ```
 
+Also, the trajecory information
+```
+include("paper_plots.jl")
+stability1()  # figure 2
+stability2()  # figure 6
+```

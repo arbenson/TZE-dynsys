@@ -28,7 +28,7 @@ function diag_tensor3_evecs(T::Array{Float64,3})
 end
 
 function S3_surface()
-    x1s, x2s = Float64[], Float64[]    
+    x1s, x2s = Float64[], Float64[]
     for r in range(0.02, 1.0, length=15)
         nsamp = max(convert(Int64, round(175 * r)), 4)
         for θ in range(0.0, 2 * π, length=nsamp)
@@ -52,10 +52,11 @@ function stability1()
         x = [x1, x2, x3]
         g = eval_map(collapse(T, x)) - x
         push!(us, g[1]); push!(vs, g[2])
-    end    
+    end
 
     close()
     quiver(x1s, x2s, us, vs, headwidth=2, headlength=3, minshaft=2)
+    gca()[:set_aspect](aspect=1.0)
 
     # Plot trajectories
     function plot_traj(integrator, xs::Vector{Float64}, maxiter::Int64)
@@ -69,6 +70,7 @@ function stability1()
         ax = gca()
         ax[:scatter](t1, t2, c=collect(1:length(t1)) / length(t1), cmap="hot", s=2)
     end
+
     Random.seed!(12345)
     xshifts = 0.02 * [ 1,  1, -1,  1,  1, -1,  1]
     yshifts = 0.02 * [-1,  1,  1,  1,  1,  1, -1]
@@ -106,6 +108,7 @@ function stability2(normalize=false)
     end
     close()
     quiver(x1s, x2s, us, vs, headwidth=2, headlength=3, minshaft=2)
+    gca()[:set_aspect](aspect=1.0)
 
     # example trajectory
     function plot_traj(integrator, xs::Vector{Float64}, maxiter::Int64)
@@ -119,6 +122,7 @@ function stability2(normalize=false)
         ax = gca()
         ax[:scatter](t1, t2, c=collect(1:length(t1)) / length(t1), cmap="hot", s=2)
     end
+
     xshifts = 0.01 * [ 1,  1, -1,  1,  1, -1,  1]
     yshifts = 0.01 * [-1,  1,  1,  1, -1,  1, -1]
     for (xs, ys, evec) in zip(xshifts, yshifts, diag_tensor3_evecs(T))
@@ -159,13 +163,13 @@ function T_36()
         end
         return S
     end
-    
+
     T = zeros(Float64, 3,3,3)
     T[1,2,3] = -0.1790
     T[2,3,3] = 0.1773 / 2
     T[1,1,2] = 0.0516 / 2
     T[1,1,3] = -0.0954 /2
-    
+
     T[1,2,2] = -0.1958 /2
     T[1,3,3] = -0.2676 /2
     T[2,2,2] = 0.3251 /6
@@ -173,11 +177,11 @@ function T_36()
     T[3,3,3] = 0.0338 /6
 
     T = symtensor(T)
-    
+
     T[1,1,1] = -0.1281
     T[2,2,2] = 0.3251
     T[3,3,3] = 0.0338
-    
+
     return T
 end
 
@@ -236,7 +240,7 @@ function example_411(eigenvalue::Float64, eval_map)
     T = T_411(5)
     maxiter = 20
     tol = -1.0  # negative to run all of the iterations
-    FE = forward_euler(0.5) 
+    FE = forward_euler(0.5)
 
     close()
     figure()
@@ -303,7 +307,7 @@ function scalability(order::Int64)
     sshopm_dims = 5:15
     sdp_dims = 5:15
     if order == 5; sdp_dims = 5:10; end
-    
+
     ds_times     = get_times("DS",      ds_dims)
     sshopm_times = get_times("SS-HOPM", sshopm_dims)
     sdp_times    = get_times("SDP",     sdp_dims)
