@@ -31,8 +31,9 @@ are the corresponding eigenvector estimate.
 """
 function TZE_dynsys(T::Array{Float64}, Λ, Integrator;
                     x0::Vector{Float64}=normalize(ones(Float64, size(T)[1])),
-                    tol::Float64=1e-10,
-                    maxiter::Int64=100)
+                    tol::Float64=1e-6,
+                    maxiter::Int64=100,
+                    normalize::Bool=false)
     # Data recording
     evec_hist = zeros(Float64, length(x0), maxiter + 1)
     evec_hist[:, 1] = x0
@@ -47,13 +48,15 @@ function TZE_dynsys(T::Array{Float64}, Λ, Integrator;
     while iter <= maxiter
         x_curr = evec_hist[:, iter]
         x_next = real.(Integrator(derivative, x_curr))
+        if normalize; normalize!(x_next); end
         evec_hist[:, iter + 1] = x_next
         y = apply(T, x_next)
         rq = x_next' * y
         eval_hist[iter + 1] = rq
         # Break if we are close enough to an eigenvalue
         iter += 1
-        if norm(y - rq * x_next, 2) / norm(x_next, 2) <= tol
+        if sqrt((rq - eval_hist[iter])^2 / eval_hist[iter]^2) < tol &&
+            norm(x_next - x_curr) / norm(x_curr) < tol
             converged = true
             break
         end

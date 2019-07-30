@@ -14,10 +14,23 @@ function diag_tensor()
     return T
 end
 
+function diag_tensor3_evecs(T::Array{Float64,3})
+    a, b, c = T[1,1,1], T[2,2,2], T[3,3,3]
+    evecs = []
+    push!(evecs, [1.0, 0.0, 0.0])
+    push!(evecs, [0.0, 1.0, 0.0])
+    push!(evecs, [0.0, 0.0, 1.0])
+    push!(evecs, normalize!([b / a, 1.0,   0.0]))
+    push!(evecs, normalize!([b / c, 0.0,   1.0]))
+    push!(evecs, normalize!([0.0,   c / b, 1.0]))
+    push!(evecs, normalize!([c / a, c / b, 1.0]))
+    return evecs
+end
+
 function S3_surface()
     x1s, x2s = Float64[], Float64[]    
     for r in range(0.02, 1.0, length=15)
-        nsamp = max(convert(Int64, round(150 * r)), 4)
+        nsamp = max(convert(Int64, round(175 * r)), 4)
         for θ in range(0.0, 2 * π, length=nsamp)
             x1 = r * cos(θ)
             x2 = r * sin(θ)
@@ -29,8 +42,8 @@ function S3_surface()
     return x1s, x2s
 end
 
-function stability(eval_map, x0::Vector{Float64},
-                   title_str::AbstractString, filename::AbstractString)
+function stability1()
+    eval_map = closest_in_angle([0.0, 0.0, 1.0])
     T = diag_tensor()
     x1s, x2s = S3_surface()
     us, vs = Float64[], Float64[]
@@ -39,36 +52,101 @@ function stability(eval_map, x0::Vector{Float64},
         x = [x1, x2, x3]
         g = eval_map(collapse(T, x)) - x
         push!(us, g[1]); push!(vs, g[2])
-    end
+    end    
 
     close()
     quiver(x1s, x2s, us, vs, headwidth=2, headlength=3, minshaft=2)
-    scatter([0, 1, 0], [0, 0, 1], marker="x", s=80, color="#377eb8")     
 
-    # example trajectory
-    eval_hist, evec_hist, conv =
-        TZE_dynsys(T, eval_map, forward_euler(0.05),
-                   x0=x0, maxiter=45)
-    t1 = vec(evec_hist[1,:])
-    t2 = vec(evec_hist[2,:])
-    plot(t1, t2, color="black", lw=0.75, alpha=0.5)
-    ax = gca()
-    ax[:scatter](t1, t2, c=collect(1:length(t1)) / length(t1), cmap="hot", s=2)
+    # Plot trajectories
+    function plot_traj(integrator, xs::Vector{Float64}, maxiter::Int64)
+        push!(xs, 1.0 - sqrt(xs[1]^2 + xs[2]^2))
+        eval_hist, evec_hist, conv =
+            TZE_dynsys(T, eval_map, integrator,
+                       x0=xs, maxiter=maxiter)
+        t1 = vec(evec_hist[1,:])
+        t2 = vec(evec_hist[2,:])
+        plot(t1, t2, color="black", lw=0.75, alpha=0.5)
+        ax = gca()
+        ax[:scatter](t1, t2, c=collect(1:length(t1)) / length(t1), cmap="hot", s=2)
+    end
+    Random.seed!(12345)
+    xshifts = 0.02 * [ 1,  1, -1,  1,  1, -1,  1]
+    yshifts = 0.02 * [-1,  1,  1,  1,  1,  1, -1]
+    for (xs, ys, evec) in zip(xshifts, yshifts, diag_tensor3_evecs(T))
+        plot_traj(forward_euler(0.01), [evec[1] + xs, evec[2] + ys], 350)
+    end
+    # Plot eigenvectors
+    for evec in diag_tensor3_evecs(T)
+        scatter([evec[1]], [evec[2]], marker="x", s=100, color="#377eb8")
+    end
 
     fsz = 20
     xlabel(L"$x_1$", fontsize=fsz+2)
     ylabel(L"$x_2$", fontsize=fsz+2)
-    title(title_str, fontsize=fsz)
+    title("Closest to [0, 0, 1]", fontsize=fsz)
     ax = gca()
     ax[:set_xlim](-1.1, 1.1)
     ax[:set_ylim](-1.1, 1.1)
     ax[:tick_params]("both", labelsize=fsz-2, length=5, width=1.5)
     tight_layout()
-    savefig(filename)
+    savefig("closest_angle.eps")
 end
 
-#stability(smallest_algebraic(), [0.5, -0.5, 1 - sqrt(0.5)], "Smallest algebraic", "smallest_algebraic.eps")
-#stability(closest_in_angle([0.0, 0.0, 1.0]), [0.5, -0.5, 1 - sqrt(0.5)], "Closest to [0, 0, 1]", "closest_angle.eps")
+function stability2(normalize=false)
+    eval_map = smallest_algebraic()
+    T = diag_tensor()
+
+    x1s, x2s = S3_surface()
+    us, vs = Float64[], Float64[]
+    for (x1, x2) in zip(x1s, x2s)
+        x3 = sqrt(abs.(1 - x1^2 - x2^2))
+        x = [x1, x2, x3]
+        g = eval_map(collapse(T, x)) - x
+        push!(us, g[1]); push!(vs, g[2])
+    end
+    close()
+    quiver(x1s, x2s, us, vs, headwidth=2, headlength=3, minshaft=2)
+
+    # example trajectory
+    function plot_traj(integrator, xs::Vector{Float64}, maxiter::Int64)
+        push!(xs, 1.0 - sqrt(xs[1]^2 + xs[2]^2))
+        eval_hist, evec_hist, conv =
+            TZE_dynsys(T, eval_map, integrator,
+                       x0=xs, maxiter=maxiter, normalize=normalize)
+        t1 = vec(evec_hist[1,:])
+        t2 = vec(evec_hist[2,:])
+        plot(t1, t2, color="black", lw=0.75, alpha=0.5)
+        ax = gca()
+        ax[:scatter](t1, t2, c=collect(1:length(t1)) / length(t1), cmap="hot", s=2)
+    end
+    xshifts = 0.01 * [ 1,  1, -1,  1,  1, -1,  1]
+    yshifts = 0.01 * [-1,  1,  1,  1, -1,  1, -1]
+    for (xs, ys, evec) in zip(xshifts, yshifts, diag_tensor3_evecs(T))
+        if normalize; plot_traj(forward_euler(0.01), [evec[1] + xs, evec[2] + ys], 300)
+        else          plot_traj(forward_euler(0.01), [evec[1] + xs, evec[2] + ys], 100)
+        end
+    end
+
+    # Plot eigenvectors
+    for evec in diag_tensor3_evecs(T)
+        scatter([evec[1]], [evec[2]], marker="x", s=100, color="#377eb8")
+    end
+
+    fsz = 20
+    xlabel(L"$x_1$", fontsize=fsz+2)
+    ylabel(L"$x_2$", fontsize=fsz+2)
+    title("Smallest algebraic", fontsize=fsz)
+    ax = gca()
+    ax[:set_xlim](-1.1, 1.1)
+    ax[:set_ylim](-1.1, 1.1)
+    ax[:tick_params]("both", labelsize=fsz-2, length=5, width=1.5)
+    tight_layout()
+    show()
+    if normalize; savefig("smallest_algebraic_norm.eps")
+    else          savefig("smallest_algebraic.eps")
+    end
+end
+#stability2()
 
 # Tensor in Example 3.6 from Kolda and Mayo. "Shifted power method for computing
 # tensor eigenpairs." SIMAX, 2011.
