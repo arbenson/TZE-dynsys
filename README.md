@@ -2,7 +2,7 @@
 
 This code and data repository accompanies the paper
 
-- Computing tensor Z-eigenvectors with dynamical systems. Austin R. Benson and David F. Gleich. [*arXiv:1805.00903*](http://arxiv.org/abs/arXiv:1805.00903), 2018.
+- Computing tensor Z-eigenvectors with dynamical systems. Austin R. Benson and David F. Gleich. [*SIAM Journal on Matrix Analysis and Applications*](https://doi.org/10.1137/18M1229584), 2019.
 
 All of the code is written in Julia 1.0.
 
